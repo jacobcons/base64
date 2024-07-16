@@ -19,10 +19,21 @@ func main() {
 	}
 	base64Alphabet = append(base64Alphabet, '+', '/')
 
-	fmt.Println(encode([]byte("hel")))
+	fmt.Println(encode([]byte("abcdefgha")))
 }
 
 func encode(bytes []byte) string {
+	// number of zeroed bytes to add to ensure bytes is a multiple of 3
+	bytesToAdd := 3 - len(bytes)%3
+	if bytesToAdd == 3 {
+		bytesToAdd = 0
+	}
+	// add those zeroed bytes
+	for i := 0; i < bytesToAdd; i++ {
+		bytes = append(bytes, byte(0))
+	}
+
+	// iterate over the bytes => iterate over each bit in byte => build up six bit chunks
 	sixBitChunks := []byte{}
 	sixBitChunk := byte(0)
 	bitsAddedToChunk := 0
@@ -42,10 +53,17 @@ func encode(bytes []byte) string {
 		}
 	}
 
+	// convert six bit chunks to chars
 	result := []rune{}
 	for _, chunk := range sixBitChunks {
 		result = append(result, base64Alphabet[chunk])
 	}
+
+	// convert any zeroed bytes that were added to end to '='
+	for i := len(result) - bytesToAdd; i < len(result); i++ {
+		result[i] = '='
+	}
+
 	return string(result)
 }
 
