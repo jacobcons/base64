@@ -1,5 +1,7 @@
 package b64
 
+import "slices"
+
 var base64Alphabet []rune
 
 func init() {
@@ -62,7 +64,31 @@ func Encode(bytes []byte) string {
 }
 
 func Decode(str string) []byte {
-	return []byte{}
+	bytes := []byte{}
+	byteChunk := byte(0)
+	bitsAddedToChunk := 0
+	// iterate over the characters => get six bits that each character represents => iterate over bits => build up byte chunks
+	for _, c := range str {
+		if c == '=' {
+			continue
+		}
+		sixBitChunk := byte(slices.Index(base64Alphabet, c))
+		for i := 5; i >= 0; i-- {
+			bit := getBit(sixBitChunk, i)
+			byteChunk += bit
+			byteChunk <<= 1
+
+			bitsAddedToChunk += 1
+			if bitsAddedToChunk == 8 {
+				byteChunk >>= 1
+				bytes = append(bytes, byteChunk)
+				byteChunk = 0
+				bitsAddedToChunk = 0
+			}
+		}
+	}
+
+	return bytes
 }
 
 func getBit(b byte, pos int) byte {
