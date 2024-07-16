@@ -1,12 +1,8 @@
-package main
-
-import (
-	"fmt"
-)
+package b64
 
 var base64Alphabet []rune
 
-func main() {
+func init() {
 	// create array that maps 6 bit binary chunks to characters
 	for l := 'A'; l <= 'Z'; l++ {
 		base64Alphabet = append(base64Alphabet, l)
@@ -18,11 +14,9 @@ func main() {
 		base64Alphabet = append(base64Alphabet, l)
 	}
 	base64Alphabet = append(base64Alphabet, '+', '/')
-
-	fmt.Println(encode([]byte("abcdefgha")))
 }
 
-func encode(bytes []byte) string {
+func Encode(bytes []byte) string {
 	// number of zeroed bytes to add to ensure bytes is a multiple of 3
 	bytesToAdd := 3 - len(bytes)%3
 	if bytesToAdd == 3 {
@@ -65,6 +59,10 @@ func encode(bytes []byte) string {
 	}
 
 	return string(result)
+}
+
+func Decode(str string) []byte {
+	return []byte{}
 }
 
 func getBit(b byte, pos int) byte {
