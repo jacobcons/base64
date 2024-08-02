@@ -1,29 +1,28 @@
 package b64
 
-import "slices"
+import (
+	"slices"
+)
 
-var base64Alphabet []rune
+var base64Alphabet []byte
 
 func init() {
 	// create array that maps 6 bit binary chunks to characters
 	for l := 'A'; l <= 'Z'; l++ {
-		base64Alphabet = append(base64Alphabet, l)
+		base64Alphabet = append(base64Alphabet, byte(l))
 	}
 	for l := 'a'; l <= 'z'; l++ {
-		base64Alphabet = append(base64Alphabet, l)
+		base64Alphabet = append(base64Alphabet, byte(l))
 	}
 	for l := '0'; l <= '9'; l++ {
-		base64Alphabet = append(base64Alphabet, l)
+		base64Alphabet = append(base64Alphabet, byte(l))
 	}
-	base64Alphabet = append(base64Alphabet, '+', '/')
+	base64Alphabet = append(base64Alphabet, byte('+'), byte('/'))
 }
 
 func Encode(bytes []byte) string {
 	// number of zeroed bytes to add to ensure bytes is a multiple of 3
-	bytesToAdd := 3 - len(bytes)%3
-	if bytesToAdd == 3 {
-		bytesToAdd = 0
-	}
+	bytesToAdd := (3 - len(bytes)%3) % 3
 	// add those zeroed bytes
 	for i := 0; i < bytesToAdd; i++ {
 		bytes = append(bytes, byte(0))
@@ -50,7 +49,7 @@ func Encode(bytes []byte) string {
 	}
 
 	// convert six bit chunks to chars
-	result := []rune{}
+	result := []byte{}
 	for _, chunk := range sixBitChunks {
 		result = append(result, base64Alphabet[chunk])
 	}
@@ -68,7 +67,8 @@ func Decode(str string) []byte {
 	byteChunk := byte(0)
 	bitsAddedToChunk := 0
 	// iterate over the characters => get six bits that each character represents => iterate over bits => build up byte chunks
-	for _, c := range str {
+	for i, _ := range str {
+		c := str[i]
 		if c == '=' {
 			continue
 		}
